@@ -92,11 +92,11 @@ contract BlankMarketplace {
     // Steps:
     // 1. Create a function `buyNFT` for users to purchase listed NFTs.
     // 2. Function should accept `bytes32 auctionId`.
-    // 3. Use `getAuctionId` to get the auction from the storage.
+    // 3. Use `getAuction` to get the auction from the storage.
     // 4. Verify the buyer has enough ERC20 tokens; otherwise, revert with appropriate error.
     // 5. Call internal `_transferAssets` function to transfer NFT and ERC20 funds to buyer and seller addresses respectively.
     // 6. Remove the auction from the mapping.
-    // 7. Emit an AuctionSuccessful event with the purchase details.
+    // 7. Emit an AuctionSuccessfull event with the purchase details.
 
     // Note: To check if user has enough ERC20 tokens use `paymentToken.balanceOf();`
 
@@ -112,7 +112,7 @@ contract BlankMarketplace {
     // Steps:
     // 1. Create a function `removeFromSale` allowing sellers to cancel their listings.
     // 2. It should accept `bytes32 auctionId` parameter.
-    // 3. Use `getAuctionId` to get the auction from the storage.
+    // 3. Use `getAuction` to get the auction from the storage.
     // 4. Verify the caller is the seller of the NFT.
     // 5. Remove the auction from the mapping.
     // 5. Emit an AuctionCanceled event.
