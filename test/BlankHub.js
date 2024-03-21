@@ -12,13 +12,89 @@ describe("BlankHub", function () {
   });
 
   describe("Blank Hub", function () {
-    it("should stake properly", async function () {});
+    it("should stake properly", async function () {
+      const stakeAmount = 100;
 
-    it("shouldn't allow staking without transferring ERC20 tokens", async function () {});
+      await blankERC20.mint(addr1.address, stakeAmount);
+      await blankERC20.approve(blankHub.address, stakeAmount);
 
-    it("should vote properly", async function () {});
+      await expect(blankHub.stakeERC20(stakeAmount))
+        .to.emit(blankHub, "Stake")
+        .withArgs(addr1.address, stakeAmount);
 
-    it("shouldn't allow multiple votes from the same address", async function () {});
-    it("should claim rewards accordingly", async function () {});
+      const userStake = await blankHub.getStakesForAccount();
+
+      expect(userStake).to.equal(stakeAmount);
+    });
+
+    it("shouldn't allow staking without transferring ERC20 tokens", async function () {
+      const stakeAmount = 100;
+
+      await blankERC20.mint(addr1.address, stakeAmount);
+      await blankERC20.approve(blankHub.address, stakeAmount);
+
+      await expect(blankHub.stakeERC20(stakeAmount))
+        .to.emit(blankHub, "Stake")
+        .withArgs(addr1.address, stakeAmount);
+
+      const balanceAfterStake = await blankERC20.balanceOf(addr1.address);
+
+      expect(balanceAfterStake).to.equal(0);
+    });
+
+    it("should vote properly", async function () {
+      const stakeAmount = 100;
+
+      await blankERC20.mint(addr1.address, stakeAmount);
+      await blankERC20.approve(blankHub.address, stakeAmount);
+
+      await blankHub.stakeERC20(stakeAmount);
+
+      const proposalId = 100;
+
+      await expect(blankHub.vote(proposalId))
+        .to.emit(blankHub, "Vote")
+        .withArgs(addr1.address, stakeAmount);
+
+      await expect(blankHub.vote(proposalId)).to.be.reverted;
+    });
+
+    it("shouldn't allow multiple votes from the same address", async function () {
+      const stakeAmount = 200;
+
+      await blankERC20.mint(addr1.address, stakeAmount);
+      await blankERC20.approve(blankHub.address, stakeAmount);
+
+      await blankHub.stakeERC20(stakeAmount);
+
+      const proposalId = 100;
+
+      await expect(blankHub.vote(proposalId)).to.be.fulfilled;
+
+      await expect(blankHub.vote(proposalId)).to.be.revertedWithCustomError(
+        blankHub,
+        "AlreadyVoted"
+      );
+    });
+
+    it("should claim reward", async function () {
+      const initialBalance = await blankERC20.balanceOf(addr1.address);
+
+      const stakeAmount = 100;
+      const expectedReward = 10 * stakeAmount - stakeAmount;
+
+      await blankERC20.mint(addr1.address, stakeAmount);
+      await blankERC20.approve(blankHub.address, stakeAmount);
+
+      await blankHub.stakeERC20(stakeAmount);
+
+      await blankHub.connect(addr1).claimRewards();
+
+      const finalBalance = await blankERC20.balanceOf(addr1.address);
+
+      const reward = finalBalance.sub(stakeAmount);
+
+      expect(reward).to.be.equal(expectedReward);
+    });
   });
 });
