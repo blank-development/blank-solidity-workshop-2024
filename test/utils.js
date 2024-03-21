@@ -30,8 +30,25 @@ async function deployBlankMarketplace(blankERC20Address) {
   return blankMarketplace;
 }
 
+async function deployBlankHubWithDeps() {
+  const blankERC20 = await deployBlankERC20();
+
+  const BlankHub = await ethers.getContractFactory("BlankHub");
+
+  const blankHub = await BlankHub.deploy(blankERC20.address);
+
+  await blankHub.deployed();
+
+  await blankERC20.setMintCap(ethers.utils.parseUnits("1000"));
+
+  await blankERC20.mint(blankHub.address, ethers.utils.parseUnits("1000"));
+
+  return [blankHub, blankERC20];
+}
+
 module.exports = {
   deployBlankERC20,
   deployBlankERC721,
   deployBlankMarketplace,
+  deployBlankHubWithDeps,
 };

@@ -81,7 +81,7 @@ contract BlankMarketplace {
             revert InsufficientFunds();
         }
 
-        _transferNFT(auction);
+        _transferAssets(auction);
 
         _removeAuction(auctionId);
 
@@ -128,7 +128,7 @@ contract BlankMarketplace {
         return auction;
     }
 
-    function _transferNFT(Auction memory auction) private {
+    function _transferAssets(Auction memory auction) private {
         paymentToken.transferFrom(msg.sender, auction.seller, auction.price);
 
         ERC721(auction.nftContract).transferFrom(

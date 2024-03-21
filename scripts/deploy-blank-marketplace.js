@@ -10,7 +10,10 @@ async function main() {
 
   const BlankMarketplace = await ethers.getContractFactory("BlankMarketplace");
 
-  const blankMarketplace = await BlankMarketplace.deploy();
+  const blankMarketplace = await BlankMarketplace.deploy(
+    "0x123" // your ERC20 payment token address
+  );
+
   await blankMarketplace.deployed();
 
   console.log("🚀 Blank Marketplace deployed to: ", blankMarketplace.address);
